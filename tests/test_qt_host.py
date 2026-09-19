@@ -22,11 +22,21 @@ from bfocus_widget.qt.host import _BannerDialog  # noqa: E402
 from bfocus_widget.core.storage import StateStore  # noqa: E402
 from bfocus_widget import __version__  # noqa: E402
 from bfocus_widget.core.widget import BFocusWidget  # noqa: E402
-from PySide6.QtCore import QCoreApplication, Qt  # noqa: E402
+from PySide6.QtCore import QCoreApplication, QEvent, Qt  # noqa: E402
 from PySide6.QtWebEngineCore import QWebEngineProfile  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 pytestmark = [pytest.mark.qt, pytest.mark.integration]
+
+
+def flush_deletes(app, rounds=5):
+    """Entrega os `deleteLater` pendentes. Fora de um `exec()` o Qt não roda os DeferredDelete
+    sozinho: sem isto as views ficariam vivas até o fim do processo."""
+    for _ in range(rounds):
+        app.processEvents()
+        QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+        time.sleep(0.01)
+    app.processEvents()
 
 
 @pytest.fixture(scope="module")
@@ -34,6 +44,39 @@ def qapp():
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     app = QApplication.instance() or QApplication(["bfocus-tests"])
     yield app
+    # Nada de Qt pode sobrar para a finalização do interpretador: janelas soltas (diálogos sem
+    # pai) são destruídas aqui, na thread principal, com o QApplication ainda vivo.
+    for w in QApplication.topLevelWidgets():
+        w.close()
+        w.deleteLater()
+    flush_deletes(app)
+
+
+@pytest.fixture
+def qt_owned(qapp):
+    """Destrói na ordem certa o que cada teste criou: páginas/views (hosts) ANTES do perfil.
+    O perfil apagado com página viva é o "Release of profile requested but WebEnginePage still
+    not deleted" e termina em SIGSEGV no fim do processo (QQuickWidget::~QQuickWidget)."""
+    owned = {"widgets": [], "hosts": [], "profiles": []}
+    yield owned
+    for widget in owned["widgets"]:
+        widget.shutdown()
+    for host in owned["hosts"]:
+        try:
+            host._retry_timer.stop()
+            host._ready_timer.stop()
+            host._drop_views()  # tickets + banner + histórico (estes dois são janelas sem pai)
+            host.hide()
+            host.deleteLater()
+        except RuntimeError:  # objeto C++ já destruído
+            pass
+    flush_deletes(qapp, rounds=20)  # o Chromium desmonta as páginas de forma assíncrona
+    for profile in owned["profiles"]:
+        try:
+            profile.deleteLater()
+        except RuntimeError:
+            pass
+    flush_deletes(qapp)
 
 
 def pump(app, pred, timeout=20.0):
@@ -47,7 +90,17 @@ def pump(app, pred, timeout=20.0):
     return pred()
 
 
-def make(server, qapp, tmp_path, **kw):
+def make_host(qt_owned, qapp, widget, **kw):
+    # Perfil sem disco (off-the-record) para o teste não sujar o perfil real.
+    profile = QWebEngineProfile(qapp)
+    host = BFocusQtHost(widget, profile=profile, **kw)
+    qt_owned["widgets"].append(widget)
+    qt_owned["hosts"].append(host)
+    qt_owned["profiles"].append(profile)
+    return host
+
+
+def make(server, qapp, qt_owned, tmp_path, **kw):
     cfg = config_for("min", apiBaseUrl=server.base, embedBaseUrl=server.base + "/v1", client=f"python/{__version__}")
     events = {"errors": [], "badge": []}
     widget = BFocusWidget(
@@ -56,8 +109,7 @@ def make(server, qapp, tmp_path, **kw):
         on_badge_changed=lambda label: events["badge"].append(label),
         notifier=lambda *a: None, **kw,
     )
-    # Perfil sem disco (off-the-record) para o teste não sujar o perfil real.
-    host = BFocusQtHost(widget, extra_params=[("script", "all")], profile=QWebEngineProfile(qapp))
+    host = make_host(qt_owned, qapp, widget, extra_params=[("script", "all")])
     opened = []
     host.external_opener = lambda url: opened.append(url.toString())
     host.save_path_provider = lambda name: str(tmp_path / name)
@@ -66,8 +118,8 @@ def make(server, qapp, tmp_path, **kw):
     return widget, host, events, opened, got
 
 
-def test_tickets_bridge_and_host_messages(server, qapp, tmp_path):
-    widget, host, events, opened, got = make(server, qapp, tmp_path)
+def test_tickets_bridge_and_host_messages(server, qapp, qt_owned, tmp_path):
+    widget, host, events, opened, got = make(server, qapp, qt_owned, tmp_path)
     button = BFocusLauncherButton(widget)
     widget.start()
     assert widget.wait_first_call(10)
@@ -109,12 +161,11 @@ def test_tickets_bridge_and_host_messages(server, qapp, tmp_path):
     button.deleteLater()
     widget.logout()
     assert pump(qapp, lambda: host._tickets is None, 5)
-    host.deleteLater()
 
 
-def test_banner_modal_and_history(server, qapp, tmp_path):
+def test_banner_modal_and_history(server, qapp, qt_owned, tmp_path):
     server.scenario("banner")
-    widget, host, events, opened, got = make(server, qapp, tmp_path)
+    widget, host, events, opened, got = make(server, qapp, qt_owned, tmp_path)
     pill = BFocusReleaseBadge(widget)
     widget.start()
     assert pump(qapp, lambda: host._banner is not None, 10)
@@ -135,7 +186,6 @@ def test_banner_modal_and_history(server, qapp, tmp_path):
     assert all(s == "history" for s, _ in got)
     widget.shutdown()
     pill.deleteLater()
-    host.deleteLater()
 
 
 def test_banner_dialog_cannot_be_dismissed(qapp):
@@ -150,14 +200,14 @@ def test_banner_dialog_cannot_be_dismissed(qapp):
     qapp.processEvents()
     assert not dlg.isVisible()
     dlg.deleteLater()
+    flush_deletes(qapp)
 
 
-def test_offline_screen(qapp, tmp_path):
+def test_offline_screen(qapp, qt_owned, tmp_path):
     # Porta fechada: a página não carrega → tela "sem conexão" com "tentar de novo".
     cfg = config_for("min", apiBaseUrl="http://127.0.0.1:9", embedBaseUrl="http://127.0.0.1:9/v1")
     widget = BFocusWidget(cfg, store=StateStore(tmp_path), notifier=lambda *a: None)
-    host = BFocusQtHost(widget, profile=QWebEngineProfile(qapp))
+    host = make_host(qt_owned, qapp, widget)
     widget.open()
     assert pump(qapp, lambda: host._stack.currentWidget() is host._offline, 20)
     widget.close()
-    host.deleteLater()

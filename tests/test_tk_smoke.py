@@ -1,6 +1,8 @@
 """Smoke da UI Tk: cria e destrói todas as janelas e telas contra a API simulada."""
 from __future__ import annotations
 
+import gc
+import queue
 import time
 import tkinter as tk
 
@@ -35,7 +37,47 @@ class SmokeApi(FakeApi):
 
 
 @pytest.fixture
-def root():
+def _tk_gc_on_main_thread():
+    """O Tk só pode ser tocado (e finalizado) na thread principal. Com o coletor automático
+    ligado, um ciclo com `tk.Variable`/`PhotoImage`/o próprio `tkapp` pode ser coletado por
+    QUALQUER thread que aloque (as do runner, a do launcher-state de outro teste): na 3.9 isso
+    dá "RuntimeError: main thread is not in main loop" no `__del__` e, se o último a morrer é o
+    interpretador Tcl, abort (Tcl_AsyncDelete) no fim do processo. Então: coletor desligado
+    durante o teste e coleta explícita aqui, na thread principal, depois do `root` destruído
+    (este fixture é montado antes do `root`, logo desmontado depois dele)."""
+    was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        yield
+    finally:
+        gc.collect()
+        if was_enabled:
+            gc.enable()
+
+
+def _drain_tk(r):
+    """Para o que ainda pode chamar o Tk ou segurar objetos dele: threads do runner (join),
+    fila de callbacks e `after` pendentes. Tudo na thread principal, antes do `destroy()`."""
+    runner = getattr(r, "_bfocus_runner", None)
+    if runner is not None:
+        runner.close()
+        runner._pool.shutdown(wait=True)  # nenhuma thread do runner sobrevive ao teste
+        while True:
+            try:
+                runner._queue.get_nowait()
+            except queue.Empty:
+                break
+        runner.root = None  # quebra o ciclo root → runner → root
+        del r._bfocus_runner
+    try:
+        for after_id in r.tk.splitlist(r.tk.call("after", "info")):
+            r.after_cancel(after_id)
+    except tk.TclError:
+        pass
+
+
+@pytest.fixture
+def root(_tk_gc_on_main_thread):
     try:
         r = tk.Tk()
     except tk.TclError:
@@ -45,6 +87,7 @@ def root():
     r.report_callback_exception = lambda *a: errors.append(a)
     r.errors = errors
     yield r
+    _drain_tk(r)
     try:
         r.destroy()
     except tk.TclError:
