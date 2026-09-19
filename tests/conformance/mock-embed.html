@@ -1,0 +1,108 @@
+<!doctype html>
+<!--
+  Embed SIMULADO para os testes dos pacotes nativos (widgets-native/BRIEF.md).
+  Fala o Host Protocol v1 exatamente como widget/src/shared/hostBridge.ts, sem API nem React:
+  - ao carregar, envia bfocus:ready (e, com script=all, a sequência de scenarios.json
+    → mockEmbedScript), 150 ms entre mensagens;
+  - expõe window.bFocusEmbed.receive/flush/protocol;
+  - registra no servidor simulado (POST /__sent e /__received) tudo o que enviou e recebeu,
+    para o teste do pacote consultar em GET /__log.
+  Também tem um link externo, um link de download e um <input type=file> para os testes de
+  navegação travada e seletor de arquivo.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>bFocus embed simulado</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 16px; }
+    button, a { display: block; margin: 8px 0; font-size: 16px; }
+    pre { background: #f1f5f9; padding: 8px; font-size: 12px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1 id="title">embed simulado</h1>
+  <p id="params"></p>
+  <button id="btn-close" aria-label="Fechar">✕ fechar</button>
+  <a id="link-external" href="https://example.com/external">link externo</a>
+  <a id="link-download" href="/files/manual.pdf" download="manual.pdf">baixar manual.pdf</a>
+  <input id="file" type="file" multiple />
+  <h2>Recebido do host</h2>
+  <pre id="received"></pre>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search)
+      var hash = location.hash.replace(/^#/, '')
+      if (hash) new URLSearchParams(hash).forEach(function (v, k) { params.set(k, v) })
+      var page = location.pathname.indexOf('release-notes') >= 0 ? 'release-notes' : 'tickets'
+      var view = params.get('view') || (page === 'release-notes' ? 'banner' : null)
+      document.getElementById('params').textContent =
+        'host=' + params.get('host') + ' client=' + params.get('client') + ' open=' + params.get('open') + ' view=' + view
+
+      function log(kind, msg) {
+        try {
+          fetch('/__' + kind, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) })
+        } catch (e) { /* servidor simulado ausente */ }
+      }
+
+      function sender() {
+        var w = window
+        if (w.webkit && w.webkit.messageHandlers && w.webkit.messageHandlers.bfocus) return function (s) { w.webkit.messageHandlers.bfocus.postMessage(s) }
+        if (w.bFocusAndroid) return function (s) { w.bFocusAndroid.postMessage(s) }
+        if (w.flutter_inappwebview) return function (s) { w.flutter_inappwebview.callHandler('bfocus', s) }
+        if (w.chrome && w.chrome.webview) return function (s) { w.chrome.webview.postMessage(s) }
+        if (w.ReactNativeWebView) return function (s) { w.ReactNativeWebView.postMessage(s) }
+        if (w.bFocusHost) return function (s) { w.bFocusHost.postMessage(s) }
+        return null
+      }
+      var pending = []
+      function flush() {
+        var send = sender()
+        if (!send) return
+        while (pending.length) send(pending.shift())
+      }
+      function post(msg) {
+        log('sent', msg)
+        pending.push(JSON.stringify(msg))
+        flush()
+      }
+      var tries = 0
+      var timer = setInterval(function () { flush(); if (!pending.length || ++tries > 40) clearInterval(timer) }, 250)
+
+      var received = []
+      function receive(raw) {
+        var msg = raw
+        if (typeof msg === 'string') { try { msg = JSON.parse(msg) } catch (e) { return } }
+        if (!msg || typeof msg.type !== 'string' || msg.type.indexOf('bfocus:') !== 0) return
+        received.push(msg)
+        document.getElementById('received').textContent = received.map(function (m) { return JSON.stringify(m) }).join('\n')
+        log('received', msg)
+      }
+      window.bFocusEmbed = { receive: receive, flush: flush, protocol: 1 }
+      window.__mockEmbed = { received: received, post: post }
+
+      document.getElementById('btn-close').onclick = function () {
+        post(page === 'tickets' ? { type: 'bfocus:close' } : { type: 'bfocus:rn:closeHistory' })
+      }
+
+      var ready = { type: 'bfocus:ready', payload: { hp: 1, widget: page } }
+      if (page === 'release-notes') ready.payload.view = view
+      post(ready)
+
+      if (params.get('script') === 'all') {
+        var key = page === 'tickets' ? 'tickets' : 'release-notes:' + view
+        fetch('/__script?name=' + encodeURIComponent(key)).then(function (r) { return r.json() }).then(function (list) {
+          var rest = list.slice(1)  // o ready já foi
+          rest.forEach(function (m, i) {
+            setTimeout(function () {
+              var msg = JSON.parse(JSON.stringify(m).split('{origin}').join(location.origin))
+              post(msg)
+            }, 150 * (i + 1))
+          })
+        })
+      }
+    })()
+  </script>
+</body>
+</html>

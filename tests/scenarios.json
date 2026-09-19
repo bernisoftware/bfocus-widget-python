@@ -1,0 +1,610 @@
+{
+  "version": 1,
+  "hostProtocol": 1,
+  "about": "Casos de conformidade dos pacotes nativos do widget bFocus. Gerado por widgets-native/conformance/generate.mjs — não edite à mão. Contrato: docs/widget-host-protocol-v1.md e widgets-native/BRIEF.md.",
+  "defaults": {
+    "apiBaseUrl": "https://api.bfocus.com.br",
+    "embedBaseUrl": "https://widget.bfocus.com.br/v1",
+    "pollIntervalSeconds": 60,
+    "locale": "pt_BR"
+  },
+  "configs": {
+    "min": {
+      "publishableKey": "bf_pk_test_123",
+      "appId": "com.empresa.erp",
+      "client": "flutter/0.1.0",
+      "user": {
+        "externalId": "USR-1"
+      },
+      "customer": {
+        "externalId": "ACME-1"
+      }
+    },
+    "full": {
+      "publishableKey": "bf_pk_test_456",
+      "appId": "Com.Empresa.ERP",
+      "client": "android/0.1.0",
+      "user": {
+        "externalId": "USR-123",
+        "name": "Ana Souza",
+        "email": "ana@empresa.com.br",
+        "phone": "+5511999990000"
+      },
+      "customer": {
+        "externalId": "ACME-001",
+        "name": "Açaí & Cia Ltda",
+        "document": "12.345.678/0001-90",
+        "email": "ti@acai.com.br",
+        "phone": "+551130000000",
+        "website": "https://acai.com.br"
+      },
+      "userHash": "2eafc18d7055de4a496d3d2f3bb4ca5185102dc43ba29bd34471e700ac5fca8c",
+      "locale": "en",
+      "product": "erp",
+      "audience": "both",
+      "apiBaseUrl": "https://api.homolog.bfocus.com.br/",
+      "showReleaseNotes": false
+    }
+  },
+  "userPayload": [
+    {
+      "name": "min",
+      "config": "min",
+      "json": "{\"externalId\":\"USR-1\",\"locale\":\"pt_BR\",\"customer\":{\"externalId\":\"ACME-1\"}}",
+      "base64": "eyJleHRlcm5hbElkIjoiVVNSLTEiLCJsb2NhbGUiOiJwdF9CUiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTEifX0="
+    },
+    {
+      "name": "full",
+      "config": "full",
+      "json": "{\"externalId\":\"USR-123\",\"name\":\"Ana Souza\",\"email\":\"ana@empresa.com.br\",\"phone\":\"+5511999990000\",\"userHash\":\"2eafc18d7055de4a496d3d2f3bb4ca5185102dc43ba29bd34471e700ac5fca8c\",\"locale\":\"en\",\"customer\":{\"externalId\":\"ACME-001\",\"name\":\"Açaí & Cia Ltda\",\"document\":\"12.345.678/0001-90\",\"email\":\"ti@acai.com.br\",\"phone\":\"+551130000000\",\"website\":\"https://acai.com.br\"}}",
+      "base64": "eyJleHRlcm5hbElkIjoiVVNSLTEyMyIsIm5hbWUiOiJBbmEgU291emEiLCJlbWFpbCI6ImFuYUBlbXByZXNhLmNvbS5iciIsInBob25lIjoiKzU1MTE5OTk5OTAwMDAiLCJ1c2VySGFzaCI6IjJlYWZjMThkNzA1NWRlNGE0OTZkM2QyZjNiYjRjYTUxODUxMDJkYzQzYmEyOWJkMzQ0NzFlNzAwYWM1ZmNhOGMiLCJsb2NhbGUiOiJlbiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTAwMSIsIm5hbWUiOiJBw6dhw60gJiBDaWEgTHRkYSIsImRvY3VtZW50IjoiMTIuMzQ1LjY3OC8wMDAxLTkwIiwiZW1haWwiOiJ0aUBhY2FpLmNvbS5iciIsInBob25lIjoiKzU1MTEzMDAwMDAwMCIsIndlYnNpdGUiOiJodHRwczovL2FjYWkuY29tLmJyIn19"
+    }
+  ],
+  "embedUrl": [
+    {
+      "name": "minimo, lista",
+      "config": "min",
+      "page": "embed",
+      "mode": "native",
+      "expect": "https://widget.bfocus.com.br/v1/embed.html#host=native&hp=1&client=flutter%2F0.1.0&key=bf_pk_test_123&user=eyJleHRlcm5hbElkIjoiVVNSLTEiLCJsb2NhbGUiOiJwdF9CUiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTEifX0%3D&locale=pt_BR&parentOrigin=app%3A%2F%2Fcom.empresa.erp"
+    },
+    {
+      "name": "completo, abre num chamado",
+      "config": "full",
+      "page": "embed",
+      "mode": "native",
+      "open": "ticket:abc-123",
+      "expect": "https://widget.bfocus.com.br/v1/embed.html#host=native&hp=1&client=android%2F0.1.0&key=bf_pk_test_456&user=eyJleHRlcm5hbElkIjoiVVNSLTEyMyIsIm5hbWUiOiJBbmEgU291emEiLCJlbWFpbCI6ImFuYUBlbXByZXNhLmNvbS5iciIsInBob25lIjoiKzU1MTE5OTk5OTAwMDAiLCJ1c2VySGFzaCI6IjJlYWZjMThkNzA1NWRlNGE0OTZkM2QyZjNiYjRjYTUxODUxMDJkYzQzYmEyOWJkMzQ0NzFlNzAwYWM1ZmNhOGMiLCJsb2NhbGUiOiJlbiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTAwMSIsIm5hbWUiOiJBw6dhw60gJiBDaWEgTHRkYSIsImRvY3VtZW50IjoiMTIuMzQ1LjY3OC8wMDAxLTkwIiwiZW1haWwiOiJ0aUBhY2FpLmNvbS5iciIsInBob25lIjoiKzU1MTEzMDAwMDAwMCIsIndlYnNpdGUiOiJodHRwczovL2FjYWkuY29tLmJyIn19&locale=en&parentOrigin=app%3A%2F%2Fcom.empresa.erp&product=erp&audience=both&api=https%3A%2F%2Fapi.homolog.bfocus.com.br&showReleaseNotes=0&open=ticket%3Aabc-123"
+    },
+    {
+      "name": "banner de release notes",
+      "config": "full",
+      "page": "release-notes",
+      "mode": "native",
+      "view": "banner",
+      "ids": [
+        "11111111-1111-1111-1111-111111111111",
+        "22222222-2222-2222-2222-222222222222"
+      ],
+      "expect": "https://widget.bfocus.com.br/v1/release-notes.html#host=native&hp=1&client=android%2F0.1.0&key=bf_pk_test_456&user=eyJleHRlcm5hbElkIjoiVVNSLTEyMyIsIm5hbWUiOiJBbmEgU291emEiLCJlbWFpbCI6ImFuYUBlbXByZXNhLmNvbS5iciIsInBob25lIjoiKzU1MTE5OTk5OTAwMDAiLCJ1c2VySGFzaCI6IjJlYWZjMThkNzA1NWRlNGE0OTZkM2QyZjNiYjRjYTUxODUxMDJkYzQzYmEyOWJkMzQ0NzFlNzAwYWM1ZmNhOGMiLCJsb2NhbGUiOiJlbiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTAwMSIsIm5hbWUiOiJBw6dhw60gJiBDaWEgTHRkYSIsImRvY3VtZW50IjoiMTIuMzQ1LjY3OC8wMDAxLTkwIiwiZW1haWwiOiJ0aUBhY2FpLmNvbS5iciIsInBob25lIjoiKzU1MTEzMDAwMDAwMCIsIndlYnNpdGUiOiJodHRwczovL2FjYWkuY29tLmJyIn19&locale=en&parentOrigin=app%3A%2F%2Fcom.empresa.erp&product=erp&audience=both&api=https%3A%2F%2Fapi.homolog.bfocus.com.br&view=banner&ids=11111111-1111-1111-1111-111111111111%2C22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "name": "historico de release notes",
+      "config": "min",
+      "page": "release-notes",
+      "mode": "native",
+      "view": "history",
+      "expect": "https://widget.bfocus.com.br/v1/release-notes.html#host=native&hp=1&client=flutter%2F0.1.0&key=bf_pk_test_123&user=eyJleHRlcm5hbElkIjoiVVNSLTEiLCJsb2NhbGUiOiJwdF9CUiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTEifX0%3D&locale=pt_BR&parentOrigin=app%3A%2F%2Fcom.empresa.erp&view=history"
+    },
+    {
+      "name": "modo navegador (sem WebView)",
+      "config": "min",
+      "page": "embed",
+      "mode": "browser",
+      "expect": "https://widget.bfocus.com.br/v1/embed.html#host=browser&hp=1&client=flutter%2F0.1.0&key=bf_pk_test_123&user=eyJleHRlcm5hbElkIjoiVVNSLTEiLCJsb2NhbGUiOiJwdF9CUiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTEifX0%3D&locale=pt_BR&parentOrigin=app%3A%2F%2Fcom.empresa.erp"
+    }
+  ],
+  "launcherStateRequest": [
+    {
+      "name": "min",
+      "config": "min",
+      "expect": {
+        "method": "POST",
+        "url": "https://api.bfocus.com.br/api/v1/widget/launcher-state",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-bFocus-Widget-Key": "bf_pk_test_123",
+          "X-bFocus-Widget-User": "eyJleHRlcm5hbElkIjoiVVNSLTEiLCJsb2NhbGUiOiJwdF9CUiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTEifX0=",
+          "X-bFocus-Parent-Origin": "app://com.empresa.erp",
+          "X-bFocus-Client": "flutter/0.1.0"
+        },
+        "body": "{}"
+      }
+    },
+    {
+      "name": "full",
+      "config": "full",
+      "expect": {
+        "method": "POST",
+        "url": "https://api.homolog.bfocus.com.br/api/v1/widget/launcher-state?product=erp&audience=both",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-bFocus-Widget-Key": "bf_pk_test_456",
+          "X-bFocus-Widget-User": "eyJleHRlcm5hbElkIjoiVVNSLTEyMyIsIm5hbWUiOiJBbmEgU291emEiLCJlbWFpbCI6ImFuYUBlbXByZXNhLmNvbS5iciIsInBob25lIjoiKzU1MTE5OTk5OTAwMDAiLCJ1c2VySGFzaCI6IjJlYWZjMThkNzA1NWRlNGE0OTZkM2QyZjNiYjRjYTUxODUxMDJkYzQzYmEyOWJkMzQ0NzFlNzAwYWM1ZmNhOGMiLCJsb2NhbGUiOiJlbiIsImN1c3RvbWVyIjp7ImV4dGVybmFsSWQiOiJBQ01FLTAwMSIsIm5hbWUiOiJBw6dhw60gJiBDaWEgTHRkYSIsImRvY3VtZW50IjoiMTIuMzQ1LjY3OC8wMDAxLTkwIiwiZW1haWwiOiJ0aUBhY2FpLmNvbS5iciIsInBob25lIjoiKzU1MTEzMDAwMDAwMCIsIndlYnNpdGUiOiJodHRwczovL2FjYWkuY29tLmJyIn19",
+          "X-bFocus-Parent-Origin": "app://com.empresa.erp",
+          "X-bFocus-Client": "android/0.1.0"
+        },
+        "body": "{}"
+      }
+    }
+  ],
+  "badge": [
+    {
+      "name": "primeira visita grava a base e nao acende",
+      "initial": {
+        "last_seen": null,
+        "label": ""
+      },
+      "steps": [
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T10:00:00+00:00",
+          "expect": {
+            "label": "",
+            "last_seen": "2026-09-01T10:00:00+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "name": "evento novo acende o ponto",
+      "initial": {
+        "last_seen": "2026-09-01T10:00:00+00:00",
+        "label": ""
+      },
+      "steps": [
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T10:00:00+00:00",
+          "expect": {
+            "label": "",
+            "last_seen": "2026-09-01T10:00:00+00:00"
+          }
+        },
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T10:05:00+00:00",
+          "expect": {
+            "label": "•",
+            "last_seen": "2026-09-01T10:00:00+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "name": "latest nulo nao grava nem acende",
+      "initial": {
+        "last_seen": null,
+        "label": ""
+      },
+      "steps": [
+        {
+          "op": "state",
+          "latest_event_at": null,
+          "expect": {
+            "label": "",
+            "last_seen": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "mesmo instante em outro fuso nao acende",
+      "initial": {
+        "last_seen": "2026-09-01T10:00:00+00:00",
+        "label": ""
+      },
+      "steps": [
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T07:00:00-03:00",
+          "expect": {
+            "label": "",
+            "last_seen": "2026-09-01T10:00:00+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "name": "aberto: badge segue o unread e o seen move a base",
+      "initial": {
+        "last_seen": "2026-09-01T10:00:00+00:00",
+        "label": "•"
+      },
+      "steps": [
+        {
+          "op": "open",
+          "expect": {
+            "label": "•"
+          }
+        },
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T10:05:00+00:00",
+          "expect": {
+            "label": "•",
+            "last_seen": "2026-09-01T10:00:00+00:00"
+          }
+        },
+        {
+          "op": "unread",
+          "count": 3,
+          "expect": {
+            "label": "3"
+          }
+        },
+        {
+          "op": "unread",
+          "count": 120,
+          "expect": {
+            "label": "99+"
+          }
+        },
+        {
+          "op": "seen",
+          "latest_event_at": "2026-09-01T10:05:00+00:00",
+          "expect": {
+            "last_seen": "2026-09-01T10:05:00+00:00"
+          }
+        },
+        {
+          "op": "unread",
+          "count": 0,
+          "expect": {
+            "label": ""
+          }
+        },
+        {
+          "op": "close",
+          "expect": {
+            "label": ""
+          }
+        },
+        {
+          "op": "state",
+          "latest_event_at": "2026-09-01T10:05:00+00:00",
+          "expect": {
+            "label": "",
+            "last_seen": "2026-09-01T10:05:00+00:00"
+          }
+        }
+      ]
+    }
+  ],
+  "pill": [
+    {
+      "name": "sem produto",
+      "releaseNotes": {
+        "badge_version": null,
+        "product": null,
+        "banner_ids": [],
+        "has_unseen": false
+      },
+      "expect": {
+        "label": "—",
+        "dot": false,
+        "bannerIds": []
+      }
+    },
+    {
+      "name": "versao atual",
+      "releaseNotes": {
+        "badge_version": "4.2.0",
+        "product": {
+          "slug": "erp",
+          "name": "ERP",
+          "color": "#22C55E"
+        },
+        "banner_ids": [],
+        "has_unseen": false
+      },
+      "expect": {
+        "label": "v4.2.0",
+        "dot": false,
+        "bannerIds": []
+      }
+    },
+    {
+      "name": "banner pendente",
+      "releaseNotes": {
+        "badge_version": "4.2.0",
+        "product": {
+          "slug": "erp",
+          "name": "ERP",
+          "color": "#22C55E"
+        },
+        "banner_ids": [
+          "11111111-1111-1111-1111-111111111111",
+          "22222222-2222-2222-2222-222222222222"
+        ],
+        "has_unseen": true
+      },
+      "expect": {
+        "label": "v4.2.0",
+        "dot": true,
+        "bannerIds": [
+          "11111111-1111-1111-1111-111111111111",
+          "22222222-2222-2222-2222-222222222222"
+        ]
+      }
+    },
+    {
+      "name": "versao ja com v",
+      "releaseNotes": {
+        "badge_version": "V3.0.0",
+        "product": null,
+        "banner_ids": [],
+        "has_unseen": false
+      },
+      "expect": {
+        "label": "v3.0.0",
+        "dot": false,
+        "bannerIds": []
+      }
+    }
+  ],
+  "push": {
+    "register": {
+      "config": "min",
+      "token": "fcm-token-1",
+      "platform": "android",
+      "expect": {
+        "method": "POST",
+        "url": "https://api.bfocus.com.br/api/v1/widget/push/devices",
+        "json": {
+          "token": "fcm-token-1",
+          "platform": "android",
+          "app_id": "com.empresa.erp"
+        }
+      }
+    },
+    "unregister": {
+      "config": "min",
+      "token": "fcm-token-1",
+      "expect": {
+        "method": "POST",
+        "url": "https://api.bfocus.com.br/api/v1/widget/push/devices/unregister",
+        "json": {
+          "token": "fcm-token-1"
+        }
+      }
+    },
+    "handle": [
+      {
+        "name": "resposta no chamado",
+        "data": {
+          "bfocus": "1",
+          "type": "ticket.reply",
+          "ticket_id": "t-1"
+        },
+        "expect": {
+          "handled": true,
+          "navigate": {
+            "view": "ticket",
+            "ticketId": "t-1"
+          }
+        }
+      },
+      {
+        "name": "mensagem de chat",
+        "data": {
+          "bfocus": "1",
+          "type": "chat.message",
+          "ticket_id": "t-2",
+          "conversation_id": "c-1"
+        },
+        "expect": {
+          "handled": true,
+          "navigate": {
+            "view": "chat",
+            "conversationId": "c-1"
+          }
+        }
+      },
+      {
+        "name": "mudanca de status",
+        "data": {
+          "bfocus": "1",
+          "type": "ticket.status",
+          "ticket_id": "t-3"
+        },
+        "expect": {
+          "handled": true,
+          "navigate": {
+            "view": "ticket",
+            "ticketId": "t-3"
+          }
+        }
+      },
+      {
+        "name": "tipo desconhecido abre a lista",
+        "data": {
+          "bfocus": "1",
+          "type": "algo.novo"
+        },
+        "expect": {
+          "handled": true,
+          "navigate": {
+            "view": "list"
+          }
+        }
+      },
+      {
+        "name": "push de outro sistema",
+        "data": {
+          "foo": "bar"
+        },
+        "expect": {
+          "handled": false,
+          "navigate": null
+        }
+      }
+    ]
+  },
+  "launcherStateFixtures": {
+    "default": {
+      "primary_color": "#0EA5E9",
+      "tickets": {
+        "open_count": 2,
+        "total_count": 5,
+        "latest_event_at": "2026-09-01T12:00:00+00:00"
+      },
+      "chat": {
+        "enabled": true,
+        "active_conversation_id": null
+      },
+      "release_notes": {
+        "badge_version": "4.2.0",
+        "product": {
+          "slug": "erp",
+          "name": "ERP",
+          "color": "#22C55E"
+        },
+        "banner_ids": [],
+        "has_unseen": false
+      }
+    },
+    "banner": {
+      "primary_color": "#0EA5E9",
+      "tickets": {
+        "open_count": 0,
+        "total_count": 0,
+        "latest_event_at": null
+      },
+      "chat": {
+        "enabled": false,
+        "active_conversation_id": null
+      },
+      "release_notes": {
+        "badge_version": "4.2.0",
+        "product": {
+          "slug": "erp",
+          "name": "ERP",
+          "color": "#22C55E"
+        },
+        "banner_ids": [
+          "11111111-1111-1111-1111-111111111111",
+          "22222222-2222-2222-2222-222222222222"
+        ],
+        "has_unseen": true
+      }
+    },
+    "empty": {
+      "primary_color": "#6366F1",
+      "tickets": {
+        "open_count": 0,
+        "total_count": 0,
+        "latest_event_at": null
+      },
+      "chat": {
+        "enabled": false,
+        "active_conversation_id": null
+      },
+      "release_notes": {
+        "badge_version": null,
+        "product": null,
+        "banner_ids": [],
+        "has_unseen": false
+      }
+    }
+  },
+  "mockEmbedScript": {
+    "tickets": [
+      {
+        "type": "bfocus:ready",
+        "payload": {
+          "hp": 1,
+          "widget": "tickets"
+        }
+      },
+      {
+        "type": "bfocus:branding",
+        "payload": {
+          "primary_color": "#123456"
+        }
+      },
+      {
+        "type": "bfocus:unread",
+        "payload": {
+          "count": 3
+        }
+      },
+      {
+        "type": "bfocus:seen",
+        "payload": {
+          "latest_event_at": "2026-09-01T10:05:00+00:00"
+        }
+      },
+      {
+        "type": "bfocus:openExternal",
+        "payload": {
+          "url": "https://example.com/docs"
+        }
+      },
+      {
+        "type": "bfocus:download",
+        "payload": {
+          "url": "{origin}/files/manual.pdf",
+          "filename": "manual.pdf"
+        }
+      },
+      {
+        "type": "bfocus:error",
+        "payload": {
+          "code": "WIDGET_USER_HASH_INVALID"
+        }
+      },
+      {
+        "type": "bfocus:close"
+      }
+    ],
+    "release-notes:banner": [
+      {
+        "type": "bfocus:ready",
+        "payload": {
+          "hp": 1,
+          "widget": "release-notes",
+          "view": "banner"
+        }
+      },
+      {
+        "type": "bfocus:rn:branding",
+        "payload": {
+          "primary_color": "#123456"
+        }
+      },
+      {
+        "type": "bfocus:rn:done"
+      }
+    ],
+    "release-notes:history": [
+      {
+        "type": "bfocus:ready",
+        "payload": {
+          "hp": 1,
+          "widget": "release-notes",
+          "view": "history"
+        }
+      },
+      {
+        "type": "bfocus:rn:branding",
+        "payload": {
+          "primary_color": "#123456"
+        }
+      },
+      {
+        "type": "bfocus:rn:closeHistory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bfocus-widget"
+dynamic = ["version"]
+description = "Widget de suporte bFocus (chamados, chat ao vivo e release notes) para apps desktop em Python: Qt (QWebEngineView) e Tk (UI nativa)."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Berni Software" }]
+keywords = ["bfocus", "support", "helpdesk", "widget", "qt", "pyside6", "tkinter", "release-notes", "chat"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: User Interfaces",
+]
+# O núcleo é só stdlib: nenhuma dependência obrigatória.
+dependencies = []
+
+[project.optional-dependencies]
+qt = ["PySide6>=6.5"]
+tk = ["tkinterweb>=3.23"]
+test = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://bfocus.com.br"
+Repository = "https://github.com/bernisoftware/bfocus-widget-python"
+Changelog = "https://github.com/bernisoftware/bfocus-widget-python/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/bfocus_widget/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bfocus_widget"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src",
+  "tests",
+  "examples",
+  "scripts",
+  "README.md",
+  "LICENSE",
+  "CHANGELOG.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "integration: sobe o servidor simulado (node widgets-native/conformance/mock-server.mjs)",
+  "qt: precisa de PySide6 com QtWebEngine",
+  "tk: precisa de Tk com display",
+]
